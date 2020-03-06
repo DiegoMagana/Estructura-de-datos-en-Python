@@ -1,0 +1,108 @@
+import os
+#definimos la clase "nodo" 
+class node():
+    def __init__(self, dato):
+        self.left = None
+        self.right = None
+        self.dato = dato
+#definimos la clase arbol en donde se almacenaran los nodos
+class arbol():
+    def __init__(self):
+        self.root = None
+#aqui se define la funcion insert que servira para que el usuario ingrese el nodo        
+    def insert(self, a, dato):
+        if a == None:
+            a = node(dato)
+        else:
+            d = a.dato
+            if dato < d:
+                a.left = self.insert(a.left, dato)
+            else:
+                a.right = self.insert(a.right, dato)
+        return a
+#definimos la funcion de "inorden" (raíz, izquierdo, derecho)
+    def inorder(self, a):
+        if a == None:
+            return None
+        else:
+            self.inorder(a.left)
+            print(a.dato)
+            self.inorder(a.right)
+#definimos la funcion de "preorden" (izquierdo, raíz, derecho)
+    def preorder(self, a):
+        if a == None:
+            return None
+        else:
+            print(a.dato)
+            self.preorder(a.left)
+            self.preorder(a.right)
+#definimos la funcion de "postorden" (izquierdo, derecho, raíz)
+    def postorder(self, a):
+        if a == None:
+            return None
+        else:
+            self.postorder(a.left)
+            self.postorder(a.right)
+            print(a.dato)
+#definimos la funcion buscar que encontrara el nodo de manera binaria
+    def buscar(self, dato, a):
+        if a == None:
+            return None
+        else:
+            if dato == a.dato:
+                return a.dato
+            else:
+                if dato < a.dato:
+                    return self.buscar(dato, a.left)
+                else:
+                    return self.buscar(dato, a.right)
+
+tree = arbol()
+
+while True:
+    os.system("cls")
+    print("THIS IS A WONDERFULL BINARY SEARCH TREE")
+    opc = input("\n1.-INSERT NODE \n2.-INORDER \n3.-PREORDER \n4.-POSTORDER \n5.-SEARCH \n6.-QUIT \n\nCHOOSE AN OPTION -> ")
+
+    if opc == '1':
+        nodo = input("\nINSERT A NODE -> ")
+        if nodo.isdigit():
+            nodo = int(nodo)
+            tree.root = tree.insert(tree.root, nodo)
+        else:
+            print("\nINSERT ONLY DIGITS...")
+    elif opc == '2':
+        if tree.root == None:
+            print("Vacio")
+        else:
+            tree.inorder(tree.root)
+    elif opc == '3':
+        if tree.root == None:
+            print("Vacio")
+        else:
+            tree.preorder(tree.root)
+    elif opc == '4':
+        if tree.root == None:
+            print("Vacio")
+        else:
+            tree.postorder(tree.root)
+    elif opc == '5':
+        nodo = input("\nINGRES A NODE TO CHOOSE -> ")
+        if nodo.isdigit():
+            nodo = int(nodo)
+            if tree.buscar(nodo, tree.root) == None:
+                print("\nNODE NOT FOUND...")
+            else:
+                print("\nNODE FOUND -> ",tree.buscar(nodo, tree.root), " EXIST...")
+        else:
+            print("\nINSERT ONLY DIGITS...")        
+    elif opc == '6':
+        print("\nYOU HAVE CHOOSEN DEATH...I MEAN QUIT...\n")
+        os.system("pause")
+        break
+    else:
+        print("\nCOME ON GUY...CHOOSE A VALID OPTION...")
+    print()
+    os.system("pause")
+
+print()
