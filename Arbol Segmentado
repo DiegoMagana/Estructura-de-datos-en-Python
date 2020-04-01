@@ -1,0 +1,158 @@
+# Programa Python3 para mostrar operaciones de árbol de segmentos como
+# construcción, consulta y actualización
+from math import ceil, log2; 
+  
+# Una función de utilidad para obtener el
+# índice medio de los índices de esquina.  
+def getMid(s, e) : 
+    return s + (e -s) // 2;  
+  
+""" Una función recursiva para obtener la suma de valores.
+     en el rango dado de la matriz. El seguimiento
+     son parámetros para esta función.
+  
+     st -> Puntero al árbol de segmentos
+     si -> Índice del nodo actual en el árbol de segmentos.
+            Inicialmente se pasa 0 ya que la raíz siempre está en el índice 0
+     ss & se -> Índices iniciales y finales del segmento
+                 representado por el nodo actual, es decir, st [si]
+     qs & qe -> índices iniciales y finales del rango de consulta """
+def getSumUtil(st, ss, se, qs, qe, si) :  
+  
+    # Si el segmento de este nodo es parte del rango dado,
+    # luego devuelve la suma del segmento  
+    if (qs <= ss and qe >= se) : 
+        return st[si];  
+  
+    # Si el segmento de este nodo esta
+    # fuera del rango dado 
+    if (se < qs or ss > qe) : 
+        return 0;  
+  
+    # Si una parte de este segmento se superpone
+    # con el rango dado
+    mid = getMid(ss, se);  
+      
+    return getSumUtil(st, ss, mid, qs, qe, 2 * si + 1) + getSumUtil(st, mid + 1, se, qs, qe, 2 * si + 2);  
+
+""" Una función recursiva para actualizar los nodos
+que tienen el índice dado en su rango.
+Los siguientes son parámetros st, si, ss y se
+son los mismos que getSumUtil ()
+i -> índice del elemento a actualizar.
+       Este índice está en la matriz de entrada.
+diff -> Valor a agregar a todos los nodos
+que tengo en el rango """
+
+def updateValueUtil(st, ss, se, i, diff, si) :  
+  
+    # Caso base: si el índice de entrada se encuentra 
+    # fuera del alcance de este segmento
+
+    if (i < ss or i > se) : 
+        return;  
+  
+    # Si el índice de entrada está dentro del rango de este nodo, 
+    # luego actualice el valor del nodo y sus hijos
+    st[si] = st[si] + diff;  
+      
+    if (se != ss) : 
+      
+        mid = getMid(ss, se);  
+        updateValueUtil(st, ss, mid, i,  
+                        diff, 2 * si + 1);  
+        updateValueUtil(st, mid + 1, se, i,  
+                         diff, 2 * si + 2);  
+  
+# La función para actualizar un valor en la matriz de entrada
+# y árbol de segmentos. Utiliza updateValueUtil ()
+# para actualizar el valor en el árbol de segmentos
+def updateValue(arr, st, n, i, new_val) :  
+  
+# Verifique el índice de entrada erróneo
+    if (i < 0 or i > n - 1) : 
+          
+        print("entrada inválida", end = "");  
+        return;  
+  
+ # Obtenga la diferencia entre valor nuevo y valor antiguo
+    diff = new_val - arr[i];  
+  
+# Actualizar el valor en la matriz
+    arr[i] = new_val;  
+  
+# Actualizar los valores de los nodos en el árbol de segmentos
+    updateValueUtil(st, 0, n - 1, i, diff, 0);  
+  
+# Devuelve la suma de elementos en el rango de
+# index qs (inicio de consulta) a qe (final de consulta).
+# Utiliza principalmente getSumUtil ()
+def getSum(st, n, qs, qe) :  
+  
+    # Verificar valores de entrada erróneos
+    if (qs < 0 or qe > n - 1 or qs > qe) : 
+  
+        print("entrada inválida", end = "");  
+        return -1;  
+      
+    return getSumUtil(st, 0, n - 1, qs, qe, 0);  
+  
+# Una función recursiva que construye
+# Árbol de segmentos para la matriz [ss..se].
+# si es el índice del nodo actual en el árbol de segmentos st 
+def constructSTUtil(arr, ss, se, st, si) :  
+  
+# Si hay un elemento en la matriz,almacenarlo en el nodo actual de segmento de árbol y retorno
+    if (ss == se) : 
+      
+        st[si] = arr[ss];  
+        return arr[ss];  
+      
+  # Si hay más de un elemento,luego se repite para los subárboles izquierdo y derecho y almacenar la suma de valores en este nodo
+    mid = getMid(ss, se);  
+      
+    st[si] = constructSTUtil(arr, ss, mid, st, si * 2 + 1) + constructSTUtil(arr, mid + 1, se, st, si * 2 + 2);  
+      
+    return st[si];  
+  
+""" Función para construir árbol de segmentos
+de la matriz dada. Esta función asigna memoria
+para el árbol de segmentos y llama a constructSTUtil () a
+llenar la memoria asignada"""
+def constructST(arr, n) :  
+  
+# Asignar memoria para el árbol de segmentos
+# Altura del árbol de segmentos 
+    x = (int)(ceil(log2(n)));  
+# Tamaño máximo del árbol de segmentos 
+    max_size = 2 * (int)(2**x) - 1; 
+# Asignar memoria
+    st = [0] * max_size;  
+  
+# Rellene la memoria asignada st 
+    constructSTUtil(arr, 0, n - 1, st, 0);  
+  
+# Devuelve el árbol de segmento construido
+    return st;  
+  
+# Código de conductor
+if __name__ == "__main__" :  
+  
+    arr = [1, 3, 5, 7, 9, 11];  
+    n = len(arr);  
+  
+# Construir árbol de segmentos a partir de una matriz dada
+    st = constructST(arr, n);  
+  
+# Imprimir la suma de valores en la matriz del índice 1 al 3 
+    print("Suma de valores en un rango dado = ", 
+                       getSum(st, n, 1, 3));  
+  
+# Actualización: establecer arr [1] = 10 y actualizar
+# nodos de árbol de segmento correspondientes
+    updateValue(arr, st, n, 1, 10);  
+  
+# Buscar suma después de actualizar el valor
+    print("Suma de valores actualizada en el rango dado = ", 
+                     getSum(st, n, 1, 3), end = "");  
+
